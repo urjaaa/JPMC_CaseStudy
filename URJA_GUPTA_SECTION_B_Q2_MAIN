@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
+# A function to convert a decimal number n to a binary number with bits = length
+def binary(n,length):
+    m = n
+    bin = []
+    while m > 0:
+        rem = m%2
+        bin.append(rem)
+        m//=2
+    while len(bin) < length:
+        bin.append(0)
+    bin = bin[::-1]
+    return bin
+        
+
+inp = list(input().split())
+length = len(inp)
+# convert each word to lowercase
+for i in range(length):
+    inp[i] = inp[i].lower()
+pow2 = int(pow(2,length))
+#dictionaries to keep track of the probabilities
+eprobs = {"cojelo":0.1, "con":0.2, "take":0.3, "it": 0.2, "easy":0.2}
+sprobs = {"cojelo":0.3, "con":0.3, "take":0.15, "it": 0.15, "easy":0.1}
+#Initialize the score to 0 and the state to an empty list
+score = 0
+state = []
+for i in range(pow2):
+    #convert to binary with 0 -> E and 1 -> S
+    bin = binary(i,length)
+    prob = 1
+    # calculating the probability that the transition states are binary of i
+    # with 0 representing English and 1 representing Spanish.
+    for j in range(length):
+        if j == 0:
+            if bin[j] == 0:
+                prob*=0.6
+                prob*=eprobs[inp[j]]
+            else:
+                prob*=0.4
+                prob*=sprobs[inp[j]]
+        else:
+            if bin[j] == 0 and bin[j-1] == 0:
+                prob+=0.3*eprobs[inp[j]]
+            elif bin[j] == 0 and bin[j-1] == 1:
+                prob+=0.6*eprobs[inp[j]]
+            elif bin[j] == 1 and bin[j-1] == 0:
+                prob+=0.7*sprobs[inp[j]]
+            else:
+                prob+=0.4*sprobs[inp[j]]
+    # updating the maximum probability
+    if score < prob:
+        score = prob
+        state = bin
+# rounding off to 5 decimal places
+score = (format(score,".5f"))
+#print the transition states
+for v in state:
+    if v == 0:
+        print("E", end=" ")
+    else:
+        print("S", end=" ")
+print(":",score)
+
